@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>God's Eye View — Crime Observatory</title>
+<style>
+:root{color-scheme:dark;--panel:#0d1621;--line:#203246;--text:#eaf2f8;--muted:#8ea3b7;--accent:#79d8ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#17293a,#070b12 55%);font:14px/1.45 system-ui,sans-serif;color:var(--text)}
+header{padding:28px 5vw 18px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:30px;letter-spacing:.04em}header p{margin:6px 0;color:var(--muted)}
+main{max-width:1500px;margin:auto;padding:20px 5vw 50px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+button,.file{background:#142536;color:var(--text);border:1px solid #2c4258;border-radius:10px;padding:9px 12px;cursor:pointer}.file input{display:none}button:hover,.file:hover{border-color:var(--accent)}
+.notice{margin:0 0 18px;padding:12px 14px;border:1px solid #2a4055;border-radius:10px;background:#0b141e;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.card{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;padding:15px}.value{font-size:27px;font-weight:700}.label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr);gap:16px}.panel{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px}.panel h2{font-size:15px;margin:0;padding:13px 15px;border-bottom:1px solid var(--line)}
+#map{position:relative;height:560px;background:radial-gradient(circle at 50% 45%,#10283a,#08131e 65%,#060b11);overflow:hidden}.gridlines{position:absolute;inset:0;background-image:linear-gradient(rgba(121,216,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(121,216,255,.07) 1px,transparent 1px);background-size:10% 10%}
+.point{position:absolute;width:9px;height:9px;border:0;border-radius:50%;background:#ff8a65;box-shadow:0 0 0 4px rgba(255,138,101,.12),0 0 16px rgba(255,138,101,.8);transform:translate(-50%,-50%);padding:0}.legend{position:absolute;left:14px;bottom:13px;color:var(--muted);font-size:12px;background:rgba(5,9,13,.8);padding:8px 10px;border:1px solid var(--line);border-radius:9px}
+table{width:100%;border-collapse:collapse}th,td{padding:9px 11px;border-bottom:1px solid #1a2937;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.scroll{max-height:560px;overflow:auto}.muted{color:var(--muted)}pre{white-space:pre-wrap;margin:0;padding:14px;max-height:250px;overflow:auto}.empty{padding:30px;text-align:center;color:var(--muted)}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.grid{grid-template-columns:1fr}#map{height:420px}}
+</style>
+</head>
+<body>
+<header><h1>GOD'S EYE VIEW</h1><p>Crime incident observatory • public/official data only</p></header>
+<main>
+<p class="notice">Maps incident records that you provide from public or official sources. It is not a live tracker of private people and does not identify individuals.</p>
+<div class="toolbar">
+<label class="file">Import crime JSON<input id="json" type="file" accept=".json,application/json"></label>
+<label class="file">Import crime CSV<input id="csv" type="file" accept=".csv,text/csv"></label>
+<button id="demo">Load synthetic demo</button><button id="clear">Clear</button>
+<span id="status" class="muted">Ready</span>
+</div>
+<div class="grid">
+<div class="card"><div class="label">Incidents</div><div id="count" class="value">0</div></div>
+<div class="card"><div class="label">Categories</div><div id="cats" class="value">0</div></div>
+<div class="card"><div class="label">Locations</div><div id="locs" class="value">0</div></div>
+<div class="card"><div class="label">Latest date</div><div id="latest" class="value" style="font-size:18px">—</div></div>
+</div>
+<div class="layout">
+<section class="panel"><h2>Incident map</h2><div id="map"><div class="gridlines"></div><div class="legend">Approximate global view • each point = supplied incident record</div></div></section>
+<div>
+<section class="panel"><h2>Incidents</h2><div id="list" class="scroll"><div class="empty">Import a public dataset or load the synthetic demo.</div></div></section>
+<section class="panel"><h2>Selected record</h2><pre id="detail">Nothing selected.</pre></section>
+</div>
+</div>
+</main>
+<script>
+const state={items:[]};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function norm(x){return {id:x.id||x.incident_id||String(Math.random()),date:x.date||x.datetime||x.timestamp||"",category:x.category||x.type||x.offense||"Unknown",lat:Number(x.lat??x.latitude),lon:Number(x.lon??x.lng??x.longitude),location:x.location||x.address||x.place||"",raw:x};}
+function render(){
+const items=state.items;
+document.getElementById("count").textContent=items.length;
+document.getElementById("cats").textContent=new Set(items.map(x=>x.category)).size;
+document.getElementById("locs").textContent=new Set(items.map(x=>x.location||(String(x.lat)+","+String(x.lon)))).size;
+const dates=items.map(x=>x.date).filter(Boolean).sort();document.getElementById("latest").textContent=dates[dates.length-1]||"—";
+const list=document.getElementById("list");
+list.innerHTML=items.length?'<table><thead><tr><th>Date</th><th>Category</th><th>Location</th></tr></thead><tbody>'+items.map((x,i)=>'<tr><td><button data-i="'+i+'">'+esc(x.date||"—")+'</button></td><td>'+esc(x.category)+'</td><td>'+esc(x.location||"—")+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">No incidents loaded.</div>';
+document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>show(items[Number(b.dataset.i)]));draw();
+}
+function show(x){document.getElementById("detail").textContent=JSON.stringify(x?.raw||x,null,2);}
+function draw(){
+document.querySelectorAll(".point").forEach(p=>p.remove());const map=document.getElementById("map");
+state.items.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.lat>=-90&&x.lat<=90&&x.lon>=-180&&x.lon<=180).slice(0,2000).forEach(x=>{
+const p=document.createElement("button");p.className="point";p.style.left=((x.lon+180)/360*100)+"%";p.style.top=((90-x.lat)/180*100)+"%";p.title=x.category+" — "+(x.location||"");p.onclick=()=>show(x);map.appendChild(p);
+});
+}
+function loadArray(arr,label){state.items=arr.map(norm);document.getElementById("status").textContent=state.items.length+" "+label+" loaded.";render();}
+document.getElementById("json").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());const arr=Array.isArray(x)?x:(Array.isArray(x.features)?x.features.map(f=>Object.assign({},f.properties||{},{lat:f.geometry?.coordinates?.[1],lon:f.geometry?.coordinates?.[0]})):[]);loadArray(arr,"JSON incidents");}catch{document.getElementById("status").textContent="Invalid JSON dataset."}};
+document.getElementById("csv").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const lines=(await f.text()).trim().split(/\r?\n/);const headers=lines.shift().split(",").map(s=>s.trim());const arr=lines.filter(Boolean).map(line=>{const vals=line.split(",");const o={};headers.forEach((h,i)=>o[h]=(vals[i]??"").trim());return o});loadArray(arr,"CSV incidents");}catch{document.getElementById("status").textContent="Could not read CSV."}};
+document.getElementById("demo").onclick=()=>loadArray([
+{id:"demo-1",date:"2026-09-20",category:"Theft",location:"Synthetic demo A",lat:20.2961,lon:85.8245},
+{id:"demo-2",date:"2026-09-21",category:"Burglary",location:"Synthetic demo B",lat:28.6139,lon:77.2090},
+{id:"demo-3",date:"2026-09-22",category:"Robbery",location:"Synthetic demo C",lat:19.0760,lon:72.8777}
+],"synthetic incidents");
+document.getElementById("clear").onclick=()=>{state.items=[];document.getElementById("detail").textContent="Nothing selected.";document.getElementById("status").textContent="Cleared.";render()};
+render();
+</script>
+</body>
+</html>
