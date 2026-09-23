@@ -1,25 +1,42 @@
-# Crime data
+# Automatic police/open-data importer
 
-The crime dashboard uses incident records supplied from public or official sources.
+The crime dashboard at `crime/index.html` auto-detects several common public-data layouts.
 
-## JSON
+### JSON formats
 
-Simple array:
+**Generic JSON array**
+
 ```json
 [
-  {"id":"123","date":"2026-01-15","category":"Burglary","location":"Example","lat":20.29,"lon":85.82}
+  {"id":"123","date":"2026-01-15","category":"Burglary","lat":20.29,"lon":85.82}
 ]
 ```
 
-It also accepts a GeoJSON FeatureCollection, using feature properties and point coordinates.
+**GeoJSON FeatureCollection**
 
-## CSV
+The importer reads point coordinates and merges the feature `properties`.
 
-Use a header row. Common fields are:
-`id,date,category,location,lat,lon`
+**ArcGIS FeatureSet**
 
-## Privacy
+The importer reads `features[].attributes` and `features[].geometry`, including common `x/y` geometry.
 
-Use public incident information and avoid unnecessary identifiers such as names, phone numbers, private addresses, license plates, or other data that can identify individuals.
+**Socrata-style JSON**
 
-Live crime feeds vary by jurisdiction and may require API keys or have specific publication/usage rules. This project therefore does not hard-code an unverified live endpoint.
+The importer accepts a top-level `data` array.
+
+### CSV formats
+
+The importer recognizes common aliases used by police/open-data datasets. Examples include:
+
+- `Crime type`, `CrimeType`, `Offense`, `Primary Type`, `OFNS_DESC`
+- `Month`, `Date`, `Occurrence Date`, `Reported Date`
+- `Latitude` / `Longitude`
+- `Location`, `Address`, `Block`, `Location Description`
+
+The CSV parser also handles quoted fields containing commas.
+
+### Privacy
+
+Use public incident records and remove unnecessary personal identifiers before importing. Do not use this tool to track private individuals.
+
+For live feeds, obtain data from the relevant official/open-data publisher and follow its terms of use. The importer is format-focused and does not bypass API keys, access controls, or publication restrictions.
