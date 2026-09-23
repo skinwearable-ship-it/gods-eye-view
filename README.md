@@ -1,57 +1,36 @@
 # God's Eye View
 
-An open-source, offline-first security situational-awareness dashboard for computers and networks you own or are authorized to administer.
+An open-source **global public-data observatory** plus **authorized local security dashboard**.
 
-## What it does
+## Global layer
 
-- Shows a single dashboard for imported endpoint reports.
-- Collects a small, transparent set of local system/network facts with an explicit command.
-- Works without third-party web CDNs or cloud telemetry.
-- Can be carried on a USB drive.
-- Keeps data local: reports are JSON files you choose to import.
+The dashboard can load the public USGS earthquake GeoJSON feed for the previous day and plot returned global event coordinates in a lightweight map.
 
-## What it does not do
+## Authorized local layer
 
-- No keylogging, credential harvesting, screen capture, webcam/microphone access, or covert persistence.
-- No automatic execution when a USB drive is inserted.
-- No scanning of arbitrary remote networks.
-- No hidden upload of telemetry.
+Import JSON reports created by computers you own or are authorized to administer. Reports stay in the browser and are not uploaded by this repository.
 
-## USB layout
+## Run
 
-```
-gods-eye-view/
-├── dashboard/
-│   └── index.html
-├── agent/
-│   └── collect.py
-├── scripts/
-│   ├── Windows/
-│   │   └── collect-report.bat
-│   └── Linux/
-│       └── collect-report.sh
-├── docs/
-│   └── usb-setup.md
-├── LICENSE
-└── README.md
-```
+Open `dashboard/index.html`.
 
-## Quick start
+- **Refresh global events**: requires Internet access and loads the public earthquake feed.
+- **Import authorized endpoint reports**: uses the local collector in `agent/collect.py`.
+- **Load demo endpoint**: tests the UI without collecting anything.
 
-1. Copy/clone this repository to a USB drive.
-2. On a computer you own or administer, run the platform-specific collector.
-3. Open `dashboard/index.html` locally.
-4. Import one or more generated `report-*.json` files.
-5. Review the dashboard and keep the reports only where appropriate.
+## USB
 
-The collector uses Python 3 and the standard library only.
+Copy the repository directory to a USB drive. The dashboard is a static HTML file and can run without a local server.
 
-## Security model
+The global layer needs Internet access. The endpoint layer can be used offline.
 
-The dashboard is intentionally static and offline. A report is treated as untrusted input and rendered as text; it is not executed.
+## Boundaries
 
-For stronger privacy, encrypt your USB drive and do not store reports containing sensitive infrastructure information on shared computers.
+This project does not provide covert surveillance, keylogging, credential collection, screen/camera/microphone capture, persistence, or hidden telemetry. Only collect endpoint data where you have authorization.
 
-## License
+Treat real endpoint reports as sensitive infrastructure information. Encrypt the USB when appropriate, and do not commit real reports to this public repository.
 
-MIT.
+## Public data source
+
+USGS Earthquake Hazards Program feed:
+`https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson`
