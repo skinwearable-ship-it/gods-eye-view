@@ -1,0 +1,4 @@
+# Local collector output — reports may contain sensitive infrastructure data
+report-*.json
+__pycache__/
+*.pyc
