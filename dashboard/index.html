@@ -3,77 +3,169 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>God's Eye View — Global Observatory</title>
+<title>God's Eye View</title>
 <style>
-:root{color-scheme:dark;--bg:#070b12;--panel:#0d1621;--line:#203246;--text:#eaf2f8;--muted:#8ea3b7;--accent:#79d8ff;--good:#61d7a0}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#17293a,#070b12 55%);font:14px/1.45 system-ui,sans-serif;color:var(--text)}
-header{padding:26px 5vw 18px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:30px;letter-spacing:.04em}header p{margin:6px 0 0;color:var(--muted)}
-main{max-width:1500px;margin:auto;padding:20px 5vw 50px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
-button,.file{background:#142536;color:var(--text);border:1px solid #2c4258;border-radius:10px;padding:9px 12px;cursor:pointer}.file input{display:none}button:hover,.file:hover{border-color:var(--accent)}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.card{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;padding:15px}.value{font-size:27px;font-weight:700}.label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
-.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,.8fr);gap:16px}.panel{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px}.panel h2{font-size:15px;margin:0;padding:13px 15px;border-bottom:1px solid var(--line)}
-#map{position:relative;height:600px;background:radial-gradient(circle at 50% 45%,#10283a,#08131e 65%,#060b11);overflow:hidden}
-.graticule{position:absolute;inset:0;background-image:linear-gradient(rgba(121,216,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(121,216,255,.06) 1px,transparent 1px);background-size:10% 10%}
-.point{position:absolute;width:9px;height:9px;border:0;border-radius:50%;background:#ff7a7a;box-shadow:0 0 0 4px rgba(255,122,122,.12),0 0 16px rgba(255,122,122,.8);transform:translate(-50%,-50%);padding:0}.point.small{width:6px;height:6px}
-.legend{position:absolute;left:14px;bottom:13px;color:var(--muted);font-size:12px;background:rgba(5,9,13,.76);padding:8px 10px;border:1px solid var(--line);border-radius:9px}
-table{width:100%;border-collapse:collapse}th,td{padding:9px 11px;border-bottom:1px solid #1a2937;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.scroll{max-height:600px;overflow:auto}.muted{color:var(--muted)}.good{color:var(--good)}pre{white-space:pre-wrap;margin:0;padding:14px;color:#cbd9e6;max-height:260px;overflow:auto}.empty{padding:30px;text-align:center;color:var(--muted)}
-@media(max-width:1000px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.grid{grid-template-columns:1fr}#map{height:430px}}
+:root{color-scheme:dark;--bg:#070b12;--panel:#0d1621;--line:#203246;--text:#eaf2f8;--muted:#8ea3b7;--accent:#79d8ff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#17293a,#070b12 55%);font:14px/1.45 system-ui,sans-serif;color:var(--text)}
+header{padding:28px 5vw 18px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:30px;letter-spacing:.04em}
+p{color:var(--muted)}
+main{max-width:1400px;margin:auto;padding:20px 5vw}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+button,.file{background:#142536;color:var(--text);border:1px solid #2c4258;border-radius:10px;padding:9px 12px;cursor:pointer}
+button:hover,.file:hover{border-color:var(--accent)}
+.file input{display:none}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.card{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;padding:15px}
+.value{font-size:27px;font-weight:700}.label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr);gap:16px}
+.panel{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.panel h2{font-size:15px;margin:0;padding:13px 15px;border-bottom:1px solid var(--line)}
+#map{position:relative;height:560px;background:radial-gradient(circle at 50% 45%,#10283a,#08131e 65%,#060b11);overflow:hidden}
+.gridlines{position:absolute;inset:0;background-image:linear-gradient(rgba(121,216,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(121,216,255,.07) 1px,transparent 1px);background-size:10% 10%}
+.point{position:absolute;width:9px;height:9px;border:0;border-radius:50%;background:#ff7070;box-shadow:0 0 0 4px rgba(255,112,112,.12),0 0 16px rgba(255,112,112,.8);transform:translate(-50%,-50%);padding:0}
+.point.small{width:6px;height:6px}
+.legend{position:absolute;left:14px;bottom:13px;color:var(--muted);font-size:12px;background:rgba(5,9,13,.8);padding:8px 10px;border:1px solid var(--line);border-radius:9px}
+table{width:100%;border-collapse:collapse}th,td{padding:9px 11px;border-bottom:1px solid #1a2937;text-align:left}
+th{color:var(--muted);font-weight:600}.scroll{max-height:560px;overflow:auto}.muted{color:var(--muted)}
+pre{white-space:pre-wrap;margin:0;padding:14px;max-height:250px;overflow:auto}.empty{padding:30px;text-align:center;color:var(--muted)}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.grid{grid-template-columns:1fr}#map{height:420px}}
 </style>
 </head>
 <body>
-<header><h1>GOD'S EYE VIEW</h1><p>Global public-data observatory + authorized local security reports</p></header>
+<header>
+<h1>GOD'S EYE VIEW</h1>
+<p>Global public-data observatory + authorized local security reports</p>
+</header>
 <main>
 <div class="toolbar">
-<button id="refresh">Refresh global events</button>
+<button id="refresh">Refresh global earthquakes</button>
 <label class="file">Import authorized endpoint reports<input id="files" type="file" accept=".json,application/json" multiple></label>
-<button id="demo">Load demo endpoint</button><button id="clear">Clear endpoint data</button>
+<button id="demo">Load demo endpoint</button>
+<button id="clear">Clear endpoints</button>
 <span id="status" class="muted">Ready</span>
 </div>
-<section class="grid">
+
+<div class="grid">
 <div class="card"><div class="label">Global events</div><div id="eventCount" class="value">0</div></div>
 <div class="card"><div class="label">Largest magnitude</div><div id="maxMag" class="value">—</div></div>
 <div class="card"><div class="label">Authorized endpoints</div><div id="endpointCount" class="value">0</div></div>
 <div class="card"><div class="label">Last refresh</div><div id="updated" class="value" style="font-size:18px">—</div></div>
-</section>
+</div>
+
 <div class="layout">
-<div class="panel"><h2>Global public events — earthquakes</h2><div id="map"><div class="graticule"></div><div class="legend">Approximate equirectangular view • red points = public earthquake feed</div></div></div>
+<section class="panel">
+<h2>Global public events — earthquakes</h2>
+<div id="map"><div class="gridlines"></div><div class="legend">Approximate global view • public USGS earthquake feed</div></div>
+</section>
+
 <div>
-<section class="panel"><h2>Recent global events</h2><div class="scroll" id="events"><div class="empty">Press “Refresh global events”.</div></div></section>
-<section class="panel"><h2>Selected item</h2><pre id="detail">No item selected.</pre></section>
+<section class="panel">
+<h2>Recent events</h2>
+<div id="events" class="scroll"><div class="empty">Click “Refresh global earthquakes”.</div></div>
+</section>
+<section class="panel">
+<h2>Selected item</h2>
+<pre id="detail">Nothing selected.</pre>
+</section>
 </div>
 </div>
-<section class="panel"><h2>Authorized endpoint overview</h2><div class="scroll" id="endpoints"><div class="empty">Import reports produced by your local collector.</div></div></section>
+
+<section class="panel">
+<h2>Authorized endpoint overview</h2>
+<div id="endpoints" class="scroll"><div class="empty">Import reports generated by the local collector.</div></div>
+</section>
 </main>
+
 <script>
 const state={events:[],endpoints:[]};
 const FEED="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function render(){
-document.querySelector("#eventCount").textContent=state.events.length;
-const max=state.events.reduce((m,e)=>Math.max(m,Number(e.mag)||0),0);document.querySelector("#maxMag").textContent=state.events.length?max.toFixed(1):"—";
-document.querySelector("#endpointCount").textContent=new Set(state.endpoints.map(e=>e.hostname||e.id)).size;
-document.querySelector("#events").innerHTML=state.events.length?'<table><thead><tr><th>Mag</th><th>Place</th><th>Time</th></tr></thead><tbody>'+state.events.slice(0,80).map((e,i)=>'<tr><td><button data-e="'+i+'">'+esc(e.mag??"—")+'</button></td><td>'+esc(e.place)+'</td><td>'+esc(e.timeText)+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">No events loaded.</div>';
-document.querySelector("#endpoints").innerHTML=state.endpoints.length?'<table><thead><tr><th>Host</th><th>OS</th><th>Local IP</th><th>Gateway</th><th>Collected</th></tr></thead><tbody>'+state.endpoints.map((e,i)=>'<tr><td><button data-p="'+i+'">'+esc(e.hostname||e.id)+'</button></td><td>'+esc(e.os)+'</td><td>'+esc(e.network?.local_ip)+'</td><td>'+esc(e.network?.gateway)+'</td><td>'+esc(e.collected_at)+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">No authorized reports imported.</div>';
-document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>show(state.events[+b.dataset.e]));
-document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>show(state.endpoints[+b.dataset.p]));
+document.getElementById("eventCount").textContent=state.events.length;
+const max=state.events.reduce((m,e)=>Math.max(m,Number(e.mag)||0),0);
+document.getElementById("maxMag").textContent=state.events.length?max.toFixed(1):"—";
+document.getElementById("endpointCount").textContent=new Set(state.endpoints.map(e=>e.hostname||e.id)).size;
+const ev=document.getElementById("events");
+ev.innerHTML=state.events.length?
+'<table><thead><tr><th>Mag</th><th>Place</th><th>Time</th></tr></thead><tbody>'+
+state.events.slice(0,80).map((e,i)=>'<tr><td><button data-e="'+i+'">'+esc(e.mag??"—")+'</button></td><td>'+esc(e.place)+'</td><td>'+esc(e.timeText)+'</td></tr>').join("")+
+'</tbody></table>':'<div class="empty">No events loaded.</div>';
+const ep=document.getElementById("endpoints");
+ep.innerHTML=state.endpoints.length?
+'<table><thead><tr><th>Host</th><th>OS</th><th>Local IP</th><th>Gateway</th><th>Collected</th></tr></thead><tbody>'+
+state.endpoints.map((e,i)=>'<tr><td><button data-p="'+i+'">'+esc(e.hostname||e.id)+'</button></td><td>'+esc(e.os)+'</td><td>'+esc(e.network?.local_ip)+'</td><td>'+esc(e.network?.gateway)+'</td><td>'+esc(e.collected_at)+'</td></tr>').join("")+
+'</tbody></table>':'<div class="empty">No authorized reports imported.</div>';
+document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>show(state.events[Number(b.dataset.e)]));
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>show(state.endpoints[Number(b.dataset.p)]));
 draw();
 }
-function show(x){document.querySelector("#detail").textContent=JSON.stringify(x?.raw||x,null,2)}
+function show(x){document.getElementById("detail").textContent=JSON.stringify(x?.raw||x,null,2);}
 function draw(){
-document.querySelectorAll(".point").forEach(x=>x.remove());const map=document.querySelector("#map");
-state.events.slice(0,500).forEach((e,i)=>{const [lon,lat]=e.coords;const p=document.createElement("button");p.className="point"+((e.mag||0)<2.5?" small":"");p.style.left=((lon+180)/360*100)+"%";p.style.top=((90-lat)/180*100)+"%";p.title=(e.mag??"")+" — "+(e.place??"");p.onclick=()=>show(e);map.appendChild(p);});
+document.querySelectorAll(".point").forEach(p=>p.remove());
+const map=document.getElementById("map");
+state.events.slice(0,500).forEach(e=>{
+if(!Array.isArray(e.coords)||e.coords.length<2)return;
+const lon=e.coords[0],lat=e.coords[1];
+const p=document.createElement("button");
+p.className="point"+((e.mag||0)<2.5?" small":"");
+p.style.left=((lon+180)/360*100)+"%";
+p.style.top=((90-lat)/180*100)+"%";
+p.title=(e.mag??"")+" — "+(e.place??"");
+p.onclick=()=>show(e);
+map.appendChild(p);
+});
 }
 async function refresh(){
-const s=document.querySelector("#status");s.textContent="Refreshing public earthquake feed…";
-try{const r=await fetch(FEED,{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json();
-state.events=(j.features||[]).map(f=>({mag:f.properties?.mag,place:f.properties?.place||"Unknown",timeText:f.properties?.time?new Date(f.properties.time).toLocaleString():"Unknown",coords:f.geometry?.coordinates?.slice(0,2)||[0,0],raw:f})).filter(e=>Array.isArray(e.coords)&&e.coords.length===2);
-document.querySelector("#updated").textContent=new Date().toLocaleTimeString();s.textContent="Global public feed loaded.";render();
-}catch(e){s.textContent="Public feed unavailable in this browser: "+e.message;}
+const s=document.getElementById("status");s.textContent="Loading public earthquake data…";
+try{
+const r=await fetch(FEED,{cache:"no-store"});
+if(!r.ok)throw new Error("HTTP "+r.status);
+const j=await r.json();
+state.events=(j.features||[]).map(f=>({
+mag:f.properties?.mag,
+place:f.properties?.place||"Unknown",
+timeText:f.properties?.time?new Date(f.properties.time).toLocaleString():"Unknown",
+coords:f.geometry?.coordinates?.slice(0,2),
+raw:f
+})).filter(e=>Array.isArray(e.coords)&&e.coords.length===2);
+document.getElementById("updated").textContent=new Date().toLocaleTimeString();
+s.textContent="Global public feed loaded.";
+render();
+}catch(err){
+s.textContent="Could not load the public feed in this browser: "+err.message;
 }
-document.querySelector("#refresh").onclick=refresh;
-document.querySelector("#files").onchange=async e=>{let n=0;for(const f of e.target.files){try{const x=JSON.parse(await f.text());if(x?.schema==="gods-eye-view/v1"){state.endpoints.push(x);n++;}}catch{}}document.querySelector("#status").textContent=n+" authorized report(s) imported.";render();};
-document.querySelector("#demo").onclick=()=>{state.endpoints=[{schema:"gods-eye-view/v1",id:"demo-1",hostname:"lab-host",os:"Demo OS",collected_at:new Date().toISOString(),network:{local_ip:"192.168.1.20",gateway:"192.168.1.1",dns:["192.168.1.1"]},notes:"Demo data only"}];render();show(state.endpoints[0]);};
-document.querySelector("#clear").onclick=()=>{state.endpoints=[];document.querySelector("#detail").textContent="No item selected.";render();};
+}
+document.getElementById("refresh").onclick=refresh;
+document.getElementById("files").onchange=async e=>{
+let n=0;
+for(const f of e.target.files){
+try{
+const x=JSON.parse(await f.text());
+if(x?.schema==="gods-eye-view/v1"){state.endpoints.push(x);n++;}
+}catch{}
+}
+document.getElementById("status").textContent=n+" authorized report(s) imported.";
+render();
+};
+document.getElementById("demo").onclick=()=>{
+state.endpoints=[{
+schema:"gods-eye-view/v1",id:"demo-1",hostname:"lab-host",os:"Demo OS",
+collected_at:new Date().toISOString(),
+network:{local_ip:"192.168.1.20",gateway:"192.168.1.1",dns:["192.168.1.1"]},
+notes:"Demo data only"
+}];
+document.getElementById("status").textContent="Demo endpoint loaded.";
+render();
+};
+document.getElementById("clear").onclick=()=>{
+state.endpoints=[];
+document.getElementById("detail").textContent="Nothing selected.";
+document.getElementById("status").textContent="Endpoint data cleared.";
+render();
+};
 render();
 </script>
 </body>
