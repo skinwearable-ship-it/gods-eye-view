@@ -1,123 +1,143 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>God's Eye View — Flight Tracker</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>God's Eye View — Global Flight Tracker</title>
 <style>
-:root{color-scheme:dark;--bg:#050910;--panel:#0b1420;--line:#203247;--text:#eaf2f8;--muted:#8da3b7;--accent:#72d7ff;--flight:#ffb15c}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font:14px/1.4 system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 50% 5%,#17283c 0,#050910 55%)}
-header{padding:24px 5vw 18px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:30px;letter-spacing:.06em}header p{margin:6px 0 0;color:var(--muted)}
-main{max-width:1450px;margin:auto;padding:18px 5vw 42px}.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:15px}
-button,.file{border:1px solid #294057;background:#122336;color:var(--text);border-radius:10px;padding:9px 12px;cursor:pointer}button:hover,.file:hover{border-color:var(--accent)}.file input{display:none}
-.notice{padding:11px 13px;border:1px solid #294057;border-radius:10px;color:var(--muted);background:#09111b;margin-bottom:15px}
-.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:15px}.card{background:rgba(11,20,32,.94);border:1px solid var(--line);border-radius:13px;padding:13px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted)}.value{font-size:25px;font-weight:700;margin-top:4px}
-.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,.8fr);gap:15px}.panel{background:rgba(11,20,32,.95);border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:15px}.panel h2{font-size:15px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line)}
-#space{height:600px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 50%,#0d2740 0,#07131f 52%,#04080d 100%)}
-#globe{position:absolute;width:min(82%,590px);aspect-ratio:1;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 28%,#2b5874 0,#0e3a54 28%,#082337 62%,#04111a 100%);box-shadow:inset -40px -30px 58px rgba(0,0,0,.6),inset 18px 12px 50px rgba(121,216,255,.14),0 0 65px rgba(90,190,235,.12);overflow:hidden}
-#globe:after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset -30px -10px 45px rgba(0,0,0,.45),inset 10px 8px 30px rgba(180,235,255,.06)}
-.lines{position:absolute;inset:-5%;background:repeating-radial-gradient(ellipse at center,transparent 0 12%,rgba(114,215,255,.055) 12.3% 12.6%,transparent 12.9%),linear-gradient(90deg,transparent 49.6%,rgba(114,215,255,.055) 50%,transparent 50.4%),linear-gradient(20deg,transparent 49.6%,rgba(114,215,255,.04) 50%,transparent 50.4%);transform:scale(1.05)}
-.flight{position:absolute;width:11px;height:11px;padding:0;border:1px solid #ffd39b;border-radius:50%;background:var(--flight);box-shadow:0 0 0 4px rgba(255,177,92,.1),0 0 17px rgba(255,177,92,.75);transform:translate(-50%,-50%);z-index:2}.flight.small{width:8px;height:8px}
-.badge{position:absolute;left:14px;top:14px;padding:7px 9px;border-radius:9px;background:rgba(2,7,11,.74);border:1px solid var(--line);color:var(--muted);font-size:12px;z-index:3}
-table{width:100%;border-collapse:collapse}th,td{padding:8px 10px;border-bottom:1px solid #182737;text-align:left}th{color:var(--muted);font-weight:600}.scroll{max-height:600px;overflow:auto}pre{white-space:pre-wrap;max-height:250px;overflow:auto;margin:0;padding:14px}.muted{color:var(--muted)}.empty{padding:28px;text-align:center;color:var(--muted)}
-@media(max-width:1100px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.layout{grid-template-columns:1fr}}@media(max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}#space{height:440px}}
+:root{color-scheme:dark;--bg:#03070b;--panel:rgba(8,14,21,.94);--line:#203142;--text:#eaf2f8;--muted:#8297aa;--accent:#6bd9ff;--plane:#ffd073;--land:#31566a}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(circle at 50% 8%,#14253a,#03070b 58%);color:var(--text);font:14px/1.35 system-ui,sans-serif}
+header{height:62px;padding:13px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(2,6,10,.98),rgba(2,6,10,.8));position:relative;z-index:4}
+.brand{display:flex;align-items:end;justify-content:space-between;gap:15px}.brand h1{font-size:22px;letter-spacing:.08em;margin:0}.brand span{color:var(--muted);font-size:11px;letter-spacing:.08em}
+main{height:calc(100vh - 62px);display:grid;grid-template-columns:minmax(0,1fr) 370px}.stage{position:relative;min-width:0}.stage canvas{width:100%;height:100%;display:block}.tools{position:absolute;left:14px;top:14px;z-index:3;display:flex;gap:7px;flex-wrap:wrap}
+button,.file{background:rgba(10,19,29,.9);border:1px solid #2a4257;color:var(--text);border-radius:9px;padding:8px 10px;cursor:pointer;backdrop-filter:blur(5px)}button:hover,.file:hover{border-color:var(--accent)}.file input{display:none}
+.hud{position:absolute;left:14px;bottom:14px;z-index:3;display:flex;gap:7px;flex-wrap:wrap}.hud span{padding:6px 8px;border-radius:8px;background:rgba(4,9,14,.8);border:1px solid var(--line);color:var(--muted);font-size:11px}.hud b{color:var(--text)}
+.sidebar{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0}.section{border-bottom:1px solid var(--line)}.section h2{font-size:12px;margin:0;padding:10px 12px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.1em;color:#b7c9d7}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;padding:9px}.stat{background:#08121c;border:1px solid var(--line);border-radius:9px;padding:8px}.stat label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}.stat strong{font-size:18px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:9px}.filters input,.filters select{width:100%;background:#06101a;color:var(--text);border:1px solid #263b4d;border-radius:8px;padding:8px}
+.list{flex:1;overflow:auto}.row{padding:8px 11px;border-bottom:1px solid #15232f;cursor:pointer}.row:hover{background:#0b1824}.rowtop{display:flex;justify-content:space-between;gap:8px}.callsign{font-weight:700}.pill{border:1px solid #294257;border-radius:999px;padding:1px 5px;color:#a7cada;font-size:10px}.meta{color:var(--muted);font-size:11px;margin-top:2px}
+.detail{max-height:190px;overflow:auto}.detail pre{margin:0;padding:11px;white-space:pre-wrap;color:#c8d7e2;font-size:11px}.status{padding:8px 11px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
+.endpoint{padding:9px}.endpoint input{width:100%;background:#06101a;color:var(--text);border:1px solid #263b4d;border-radius:8px;padding:8px}
+@media(max-width:950px){main{grid-template-columns:minmax(0,1fr) 320px}}@media(max-width:760px){body{overflow:auto}main{display:block;height:auto}.stage{height:66vh;min-height:430px}.sidebar{border-left:0;border-top:1px solid var(--line);height:auto}.list{max-height:430px}}
 </style>
 </head>
 <body>
-<header><h1>GOD'S EYE VIEW</h1><p>Flight tracker • public data only</p></header>
+<header><div class="brand"><h1>GOD'S EYE VIEW</h1><span>GLOBAL FLIGHT TRACKER • PUBLIC DATA</span></div></header>
 <main>
-<div class="notice">Use the demo for an offline test. Live aircraft data depends on the provider and may be blocked when this file is opened directly from disk.</div>
-<div class="toolbar">
-<button id="demo">Load demo flights</button>
-<button id="live">Try live OpenSky</button>
-<label class="file">Import JSON<input id="file" type="file" accept=".json,application/json"></label>
+<section class="stage">
+<div class="tools">
+<button id="demo">Demo traffic</button>
+<button id="live">Live refresh</button>
+<button id="auto">Auto refresh: OFF</button>
+<label class="file">Import JSON<input id="import" type="file" accept=".json,application/json"></label>
 <button id="clear">Clear</button>
-<span id="status" class="muted">Ready</span>
 </div>
-
-<div class="stats">
-<div class="card"><div class="label">Aircraft</div><div id="count" class="value">0</div></div>
-<div class="card"><div class="label">Callsigns</div><div id="callsigns" class="value">0</div></div>
-<div class="card"><div class="label">Avg altitude</div><div id="alt" class="value">—</div></div>
-<div class="card"><div class="label">Avg speed</div><div id="speed" class="value">—</div></div>
-<div class="card"><div class="label">Updated</div><div id="updated" class="value" style="font-size:17px">—</div></div>
+<canvas id="map"></canvas>
+<div class="hud">
+<span>SOURCE <b id="source">Demo</b></span>
+<span>AIRCRAFT <b id="hcount">0</b></span>
+<span>VISIBLE <b id="hvis">0</b></span>
+<span>UPDATED <b id="hupdated">—</b></span>
 </div>
-
-<div class="layout">
-<section class="panel">
-<h2>Flight globe</h2>
-<div id="space"><div id="globe"><div class="lines"></div></div><div class="badge">Approximate orthographic globe • dots = aircraft with coordinates</div></div>
 </section>
-
-<div>
-<section class="panel"><h2>Aircraft list</h2><div id="list" class="scroll"><div class="empty">Click “Load demo flights”.</div></div></section>
-<section class="panel"><h2>Selected aircraft</h2><pre id="detail">Nothing selected.</pre></section>
-</div>
-</div>
+<aside class="sidebar">
+<section class="section"><h2>Air picture</h2><div class="stats">
+<div class="stat"><label>Aircraft</label><strong id="count">0</strong></div>
+<div class="stat"><label>Callsigns</label><strong id="callsigns">0</strong></div>
+<div class="stat"><label>Avg altitude</label><strong id="alt">—</strong></div>
+<div class="stat"><label>Avg speed</label><strong id="speed">—</strong></div>
+</div></section>
+<section class="section"><h2>Filters</h2><div class="filters">
+<input id="search" placeholder="Callsign / ICAO"><select id="country"><option value="">All countries</option></select>
+</div></section>
+<section class="section"><h2>Live data endpoint</h2><div class="endpoint">
+<input id="endpoint" value="https://opensky-network.org/api/states/all">
+</div></section>
+<div id="list" class="list"><div class="row meta">Click “Demo traffic” to populate the globe.</div></div>
+<section class="section detail"><h2>Selected</h2><pre id="detail">Nothing selected.</pre></section>
+<div id="status" class="status">Ready.</div>
+</aside>
 </main>
 <script>
-const state={flights:[]};
+const canvas=document.getElementById("map"),ctx=canvas.getContext("2d"),state={flights:[],yaw:-.65,pitch:.05,drag:false,lastX:0,lastY:0,auto:false,timer:null,source:"Demo"};
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function num(v){const n=Number(v);return Number.isFinite(n)?n:null}
-function clean(x){return{
-  icao:String(x.icao24??x.icao??x.hex??x.id??""),
-  callsign:String(x.callsign??x.flight??x.call_sign??"").trim(),
-  country:String(x.origin_country??x.country??""),
-  lat:num(x.latitude??x.lat),lon:num(x.longitude??x.lon??x.lng),
-  altM:num(x.baro_altitude??x.altitude_m??(x.altitude_ft!=null?Number(x.altitude_ft)*.3048:null)),
-  speedMs:num(x.velocity??x.speed_ms),
-  heading:num(x.true_track??x.heading??x.track),
-  raw:x
-}}
-function normalize(j){
-  if(Array.isArray(j))return j.map(clean);
-  if(Array.isArray(j.states))return j.states.map(a=>clean({icao24:a[0],callsign:a[1],origin_country:a[2],last_contact:a[4],longitude:a[5],latitude:a[6],baro_altitude:a[7],velocity:a[9],true_track:a[10]}));
-  if(Array.isArray(j.aircraft))return j.aircraft.map(clean);
-  if(Array.isArray(j.data))return j.data.map(clean);
-  return [];
-}
-function show(x){document.getElementById("detail").textContent=JSON.stringify(x?.raw||x,null,2)}
-function render(){
- const f=state.flights;document.getElementById("count").textContent=f.length;document.getElementById("callsigns").textContent=f.filter(x=>x.callsign).length;
- const al=f.map(x=>x.altM).filter(x=>x!=null),sp=f.map(x=>x.speedMs).filter(x=>x!=null);
- document.getElementById("alt").textContent=al.length?Math.round(al.reduce((a,b)=>a+b,0)/al.length/.3048).toLocaleString()+" ft":"—";
- document.getElementById("speed").textContent=sp.length?Math.round(sp.reduce((a,b)=>a+b,0)/sp.length*1.94384)+" kt":"—";
- document.getElementById("list").innerHTML=f.length?'<table><thead><tr><th>Callsign</th><th>Country</th><th>Altitude</th><th>Speed</th></tr></thead><tbody>'+f.slice(0,1000).map((x,i)=>'<tr><td><button data-i="'+i+'">'+esc(x.callsign||x.icao||"unknown")+'</button></td><td>'+esc(x.country)+'</td><td>'+esc(x.altM==null?"—":Math.round(x.altM/.3048).toLocaleString()+" ft")+'</td><td>'+esc(x.speedMs==null?"—":Math.round(x.speedMs*1.94384)+" kt")+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">No aircraft loaded.</div>';
- document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>show(f[Number(b.dataset.i)]));draw();
-}
-function project(lat,lon){
- const r=Math.PI/180, a=lat*r,b=lon*r;
- const visible=Math.cos(a)*Math.cos(b);
- if(visible<0)return null;
- const x=Math.cos(a)*Math.sin(b),y=Math.sin(a);
- return [50+x*48,50-y*48];
-}
-function draw(){
- document.querySelectorAll(".flight").forEach(x=>x.remove());
- const globe=document.getElementById("globe");
- state.flights.slice(0,1500).forEach(x=>{
-  if(x.lat==null||x.lon==null)return;
-  const p=project(x.lat,x.lon);if(!p)return;
-  const b=document.createElement("button");b.className="flight"+((x.altM??0)<3000?" small":"");
-  b.style.left=p[0]+"%";b.style.top=p[1]+"%";b.title=(x.callsign||x.icao)+" • "+(x.country||"");b.onclick=()=>show(x);globe.appendChild(b);
- });
-}
-function load(rows,label){state.flights=rows.filter(x=>x.lat!=null&&x.lon!=null);document.getElementById("status").textContent=state.flights.length+" "+label+" loaded";document.getElementById("updated").textContent=new Date().toLocaleTimeString();render()}
-document.getElementById("demo").onclick=()=>load([
-{icao:"demo01",callsign:"OWA101",country:"India",lat:20.3,lon:85.8,altitude_ft:33000,speed_ms:235},
-{icao:"demo02",callsign:"UAE204",country:"UAE",lat:25.2,lon:55.3,altitude_ft:37000,speed_ms:245},
-{icao:"demo03",callsign:"BAW16",country:"UK",lat:51.5,lon:-.1,altitude_ft:29000,speed_ms:220},
-{icao:"demo04",callsign:"JAL12",country:"Japan",lat:35.7,lon:139.7,altitude_ft:31000,speed_ms:240},
-{icao:"demo05",callsign:"QFA8",country:"Australia",lat:-33.9,lon:151.2,altitude_ft:35000,speed_ms:250}
-].map(clean),"synthetic flights");
-document.getElementById("file").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{load(normalize(JSON.parse(await f.text())),"imported flights")}catch(err){document.getElementById("status").textContent="Invalid flight JSON"}};
-document.getElementById("live").onclick=async()=>{
- document.getElementById("status").textContent="Trying live OpenSky data…";
- try{const r=await fetch("https://opensky-network.org/api/states/all",{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);load(normalize(await r.json()),"live aircraft")}
- catch(err){document.getElementById("status").textContent="Live feed unavailable here: "+err.message}
+const countries={
+"India":20.6,"UAE":25.2,"United States":38,"Canada":56,"United Kingdom":51,"Germany":51,"France":46,
+"Japan":35,"Australia":-25,"Singapore":1.3,"Qatar":25.3,"Brazil":-10,"South Africa":-30,"China":34,"Spain":40
 };
+const land=[
+[[-168,72],[-150,62],[-140,55],[-125,50],[-118,32],[-105,25],[-90,20],[-80,30],[-70,45],[-55,50],[-65,70],[-100,80],[-140,78]],
+[[-82,12],[-75,2],[-70,-10],[-62,-18],[-55,-30],[-60,-52],[-72,-55],[-78,-35],[-82,-15]],
+[[-17,37],[-5,43],[10,58],[25,70],[45,68],[58,55],[48,42],[35,35],[25,25],[15,10],[5,5],[-5,15]],
+[[-18,15],[-5,30],[15,32],[30,25],[42,15],[48,2],[40,-12],[32,-30],[18,-35],[5,-25],[-5,-5]],
+[[45,78],[75,72],[105,68],[140,64],[170,55],[160,42],[145,35],[125,25],[115,12],[95,8],[75,20],[60,30],[50,45]],
+[[112,-10],[130,-12],[150,-20],[154,-35],[142,-42],[125,-36],[115,-28]]
+];
+function clean(x){return{icao:String(x.icao24??x.icao??x.hex??x.id??""),callsign:String(x.callsign??x.flight??x.call_sign??"").trim(),country:String(x.origin_country??x.country??""),lat:Number(x.latitude??x.lat),lon:Number(x.longitude??x.lon??x.lng),altM:Number(x.baro_altitude??x.altitude_m??((x.altitude_ft??NaN)*.3048)),speedMs:Number(x.velocity??x.speed_ms??((x.speed_kt??NaN)*.514444)),heading:Number(x.true_track??x.heading??x.track),raw:x}};
+function normalize(j){
+if(Array.isArray(j))return j.map(clean);
+if(Array.isArray(j.states))return j.states.map(a=>clean({icao24:a[0],callsign:a[1],origin_country:a[2],longitude:a[5],latitude:a[6],baro_altitude:a[7],velocity:a[9],true_track:a[10]}));
+if(Array.isArray(j.aircraft))return j.aircraft.map(clean);
+if(Array.isArray(j.data))return j.data.map(clean);
+return [];
+}
+function makeDemo(){
+const names=["OWA","UAE","BAW","JAL","QFA","DLH","AFR","SIA","AAL","AI","ANA","QTR","KLM","ETD","THA","CPA","DAL","UAL","KAL","SWR","TAP","LAT","SAA","IBE","RYR","EIN"];
+const cs=["India","UAE","United Kingdom","Japan","Australia","Germany","France","Singapore","United States","Canada","China","Qatar","Spain"];
+const out=[];
+for(let i=0;i<75;i++){
+let lon=((i*137.508)%360)-180,lat=Math.sin(i*2.17)*58;
+let c=cs[i%cs.length],alt=26000+((i*1731)%15000),spd=410+((i*19)%110);
+out.push(clean({icao:"DEMO"+String(i+1).padStart(3,"0"),callsign:names[i%names.length]+String(100+i),country:c,lat,lon,altitude_ft:alt,speed_kt:spd,heading:(i*47)%360}));
+}
+return out;
+}
+function resize(){const r=devicePixelRatio||1,w=Math.floor(canvas.clientWidth*r),h=Math.floor(canvas.clientHeight*r);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}}
+function proj(lat,lon,R,cx,cy){const a=lat*Math.PI/180,b=lon*Math.PI/180+state.yaw,p=state.pitch;const x=Math.cos(a)*Math.sin(b),y=Math.sin(a)*Math.cos(p)-Math.cos(a)*Math.cos(b)*Math.sin(p),z=Math.sin(a)*Math.sin(p)+Math.cos(a)*Math.cos(b)*Math.cos(p);return z<-.08?null:{x:cx+x*R,y:cy-y*R,z}}
+function draw(){
+resize();const W=canvas.width,H=canvas.height,cx=W*.48,cy=H*.53,R=Math.min(W,H)*.36;ctx.clearRect(0,0,W,H);
+const rg=ctx.createRadialGradient(cx-R*.35,cy-R*.4,R*.1,cx,cy,R*1.25);rg.addColorStop(0,"#24536b");rg.addColorStop(.35,"#0b3650");rg.addColorStop(.75,"#061c2c");rg.addColorStop(1,"#020d16");ctx.fillStyle=rg;ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();
+ctx.save();ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.clip();
+ctx.strokeStyle="rgba(125,219,255,.09)";ctx.lineWidth=1;
+for(let k=-5;k<=5;k++){const y=cy+k*R/6;ctx.beginPath();ctx.ellipse(cx,y,R*Math.sqrt(Math.max(0,1-(k/6)**2)),R*.09,0,0,Math.PI*2);ctx.stroke()}
+for(let k=-5;k<=5;k++){const x=cx+k*R/6;ctx.beginPath();ctx.ellipse(x,cy,R*.09,R*Math.sqrt(Math.max(0,1-(k/6)**2)),0,0,Math.PI*2);ctx.stroke()}
+ctx.fillStyle="rgba(49,86,106,.62)";land.forEach(poly=>{ctx.beginPath();let first=true;for(const pt of poly){const q=proj(pt[1],pt[0],R,cx,cy);if(!q){first=true;continue}if(first){ctx.moveTo(q.x,q.y);first=false}else ctx.lineTo(q.x,q.y)}ctx.closePath();ctx.fill()});ctx.restore();
+ctx.strokeStyle="rgba(154,227,255,.18)";ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.stroke();
+let vis=0;const f=filtered();
+for(const x of f){const q=proj(x.lat,x.lon,R,cx,cy);if(!q)continue;vis++;const s=(x.altM>9000?4.3:3.2);
+ctx.fillStyle="#ffd073";ctx.shadowColor="rgba(255,208,115,.75)";ctx.shadowBlur=9;ctx.beginPath();ctx.arc(q.x,q.y,s,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+if(Number.isFinite(x.heading)){const a=-(x.heading*Math.PI/180);ctx.strokeStyle="rgba(255,221,157,.8)";ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+Math.cos(a)*11,q.y+Math.sin(a)*11);ctx.stroke()}
+}
+document.getElementById("hvis").textContent=vis;
+}
+function filtered(){const q=document.getElementById("search").value.toLowerCase(),c=document.getElementById("country").value;return state.flights.filter(f=>(!q||f.callsign.toLowerCase().includes(q)||f.icao.toLowerCase().includes(q))&&(!c||f.country===c))}
+function render(){
+const f=filtered(),all=[...new Set(state.flights.map(x=>x.country).filter(Boolean))].sort(),sel=document.getElementById("country"),old=sel.value;
+sel.innerHTML='<option value="">All countries</option>'+all.map(c=>'<option>'+esc(c)+'</option>').join("");if(all.includes(old))sel.value=old;
+document.getElementById("count").textContent=f.length;document.getElementById("hcount").textContent=f.length;document.getElementById("callsigns").textContent=f.filter(x=>x.callsign).length;
+const a=f.map(x=>x.altM).filter(Number.isFinite),s=f.map(x=>x.speedMs).filter(Number.isFinite);
+document.getElementById("alt").textContent=a.length?Math.round(a.reduce((u,v)=>u+v,0)/a.length/.3048).toLocaleString()+" ft":"—";
+document.getElementById("speed").textContent=s.length?Math.round(s.reduce((u,v)=>u+v,0)/s.length*1.94384)+" kt":"—";
+document.getElementById("list").innerHTML=f.length?f.slice(0,1000).map((x,i)=>'<div class="row" data-i="'+i+'"><div class="rowtop"><span class="callsign">'+esc(x.callsign||x.icao||"UNKNOWN")+'</span><span class="pill">'+esc(x.country||"—")+'</span></div><div class="meta">'+(Number.isFinite(x.altM)?Math.round(x.altM/.3048).toLocaleString()+" ft":"—")+" • "+(Number.isFinite(x.speedMs)?Math.round(x.speedMs*1.94384)+" kt":"—")+" • "+esc(x.lat.toFixed(1)+", "+x.lon.toFixed(1))+'</div></div>').join(""):'<div class="row meta">No aircraft match the filters.</div>';
+document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{state.selected=f[Number(b.dataset.i)];document.getElementById("detail").textContent=JSON.stringify(state.selected.raw||state.selected,null,2)});
+draw();
+}
+async function live(){
+const u=document.getElementById("endpoint").value.trim();if(!u)return;
+document.getElementById("status").textContent="Requesting live aircraft…";
+try{const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const rows=normalize(await r.json());if(!rows.length)throw new Error("No aircraft states returned");state.flights=rows;state.source="Live";document.getElementById("source").textContent="Live";document.getElementById("status").textContent=rows.length+" aircraft loaded from live endpoint";document.getElementById("hupdated").textContent=new Date().toLocaleTimeString();render()}
+catch(e){document.getElementById("status").textContent="Live feed failed: "+e.message}
+}
+document.getElementById("demo").onclick=()=>{state.flights=makeDemo();state.source="Demo";document.getElementById("source").textContent="Demo";document.getElementById("status").textContent="75 synthetic aircraft loaded";document.getElementById("hupdated").textContent=new Date().toLocaleTimeString();render()};
+document.getElementById("live").onclick=live;
 document.getElementById("clear").onclick=()=>{state.flights=[];document.getElementById("detail").textContent="Nothing selected.";document.getElementById("status").textContent="Cleared";render()};
-render();
+document.getElementById("search").oninput=render;document.getElementById("country").onchange=render;
+document.getElementById("import").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const rows=normalize(JSON.parse(await f.text()));if(!rows.length)throw new Error("No aircraft data");state.flights=rows;state.source="Imported";document.getElementById("source").textContent="Imported";document.getElementById("status").textContent=rows.length+" aircraft imported";document.getElementById("hupdated").textContent=new Date().toLocaleTimeString();render()}catch(err){document.getElementById("status").textContent="Invalid or unsupported flight JSON"}};
+document.getElementById("auto").onclick=()=>{state.auto=!state.auto;document.getElementById("auto").textContent="Auto refresh: "+(state.auto?"ON":"OFF");if(state.timer)clearInterval(state.timer);if(state.auto)state.timer=setInterval(live,20000)};
+canvas.addEventListener("pointerdown",e=>{state.drag=true;state.lastX=e.clientX;state.lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener("pointermove",e=>{if(!state.drag)return;state.yaw+=(e.clientX-state.lastX)*.006;state.pitch=Math.max(-.9,Math.min(.9,state.pitch+(e.clientY-state.lastY)*.006));state.lastX=e.clientX;state.lastY=e.clientY});
+canvas.addEventListener("pointerup",()=>state.drag=false);canvas.addEventListener("pointercancel",()=>state.drag=false);
+function loop(){if(state.auto&&!state.drag)state.yaw+=.0018;draw();requestAnimationFrame(loop)}
+window.addEventListener("resize",resize);document.getElementById("demo").click();requestAnimationFrame(loop);
 </script>
 </body>
 </html>
