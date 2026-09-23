@@ -1,187 +1,105 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>God's Eye View — Crime Observatory</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>God's Eye View — Flight Tracker</title>
 <style>
-:root{color-scheme:dark;--panel:#0d1621;--line:#203246;--text:#eaf2f8;--muted:#8ea3b7;--accent:#79d8ff}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#17293a,#070b12 55%);font:14px/1.45 system-ui,sans-serif;color:var(--text)}
-header{padding:28px 5vw 18px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:30px;letter-spacing:.04em}header p{margin:6px 0;color:var(--muted)}
-main{max-width:1500px;margin:auto;padding:20px 5vw 50px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
-button,.file{background:#142536;color:var(--text);border:1px solid #2c4258;border-radius:10px;padding:9px 12px;cursor:pointer}.file input{display:none}button:hover,.file:hover{border-color:var(--accent)}
-.notice{margin:0 0 18px;padding:12px 14px;border:1px solid #2a4055;border-radius:10px;background:#0b141e;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}.card{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;padding:15px}.value{font-size:27px;font-weight:700}.label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
-.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr);gap:16px}.panel{background:rgba(13,22,33,.94);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px}.panel h2{font-size:15px;margin:0;padding:13px 15px;border-bottom:1px solid var(--line)}
-#map{position:relative;height:560px;background:radial-gradient(circle at 50% 45%,#10283a,#08131e 65%,#060b11);overflow:hidden}.gridlines{position:absolute;inset:0;background-image:linear-gradient(rgba(121,216,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(121,216,255,.07) 1px,transparent 1px);background-size:10% 10%}
-.point{position:absolute;width:9px;height:9px;border:0;border-radius:50%;background:#ff8a65;box-shadow:0 0 0 4px rgba(255,138,101,.12),0 0 16px rgba(255,138,101,.8);transform:translate(-50%,-50%);padding:0}.legend{position:absolute;left:14px;bottom:13px;color:var(--muted);font-size:12px;background:rgba(5,9,13,.8);padding:8px 10px;border:1px solid var(--line);border-radius:9px}
-table{width:100%;border-collapse:collapse}th,td{padding:9px 11px;border-bottom:1px solid #1a2937;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.scroll{max-height:560px;overflow:auto}.muted{color:var(--muted)}pre{white-space:pre-wrap;margin:0;padding:14px;max-height:250px;overflow:auto}.empty{padding:30px;text-align:center;color:var(--muted)}
-@media(max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:950px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.grid{grid-template-columns:1fr}#map{height:420px}}
+:root{color-scheme:dark;--panel:#0b1420;--line:#203247;--text:#eaf2f8;--muted:#8da3b7;--accent:#72d7ff;--flight:#ffb15c}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 5%,#17283c 0,#050910 55%);color:var(--text);font:14px/1.4 system-ui,sans-serif}
+header{padding:24px 4vw 18px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:30px;letter-spacing:.06em}header p{margin:6px 0 0;color:var(--muted)}
+main{max-width:1500px;margin:auto;padding:18px 4vw 42px}.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:15px}
+button,.file{border:1px solid #294057;background:#122336;color:var(--text);border-radius:10px;padding:9px 12px;cursor:pointer}button:hover,.file:hover{border-color:var(--accent)}.file input{display:none}
+.notice{padding:11px 13px;border:1px solid #294057;border-radius:10px;color:var(--muted);background:#09111b;margin-bottom:15px}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:15px}.card{background:rgba(11,20,32,.94);border:1px solid var(--line);border-radius:13px;padding:13px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted)}.value{font-size:25px;font-weight:700;margin-top:4px}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,.8fr);gap:15px}.panel{background:rgba(11,20,32,.95);border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:15px}.panel h2{font-size:15px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line)}
+#space{height:620px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 50%,#0d2740 0,#07131f 52%,#04080d 100%)}
+#globe{position:absolute;width:min(84%,620px);aspect-ratio:1;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#214968 0,#0c3049 30%,#082132 60%,#04111b 100%);box-shadow:inset -35px -25px 55px rgba(0,0,0,.6),inset 18px 12px 45px rgba(116,220,255,.15),0 0 50px rgba(71,180,238,.1);overflow:hidden}
+.ocean-lines{position:absolute;inset:0;background-image:radial-gradient(ellipse at center,transparent 44%,rgba(114,215,255,.08) 45%,transparent 46%),linear-gradient(15deg,transparent 49.7%,rgba(114,215,255,.055) 50%,transparent 50.3%),linear-gradient(165deg,transparent 49.7%,rgba(114,215,255,.055) 50%,transparent 50.3%);transform:scale(1.15)}
+.flight{position:absolute;width:12px;height:12px;padding:0;border-radius:50%;border:1px solid #ffd39b;background:var(--flight);box-shadow:0 0 0 4px rgba(255,177,92,.1),0 0 15px rgba(255,177,92,.7);transform:translate(-50%,-50%)}.flight.small{width:8px;height:8px}
+.badge{position:absolute;left:14px;top:14px;padding:7px 9px;border-radius:9px;background:rgba(2,7,11,.72);border:1px solid var(--line);color:var(--muted);font-size:12px}
+table{width:100%;border-collapse:collapse}th,td{padding:8px 10px;border-bottom:1px solid #182737;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.scroll{max-height:620px;overflow:auto}pre{white-space:pre-wrap;max-height:260px;overflow:auto;margin:0;padding:14px}.muted{color:var(--muted)}.empty{padding:28px;text-align:center;color:var(--muted)}
+.input{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:9px}.input input{flex:1;min-width:250px;background:#08111a;border:1px solid var(--line);color:var(--text);padding:9px 10px;border-radius:9px}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.layout{grid-template-columns:1fr}}@media(max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}#space{height:470px}}
 </style>
 </head>
 <body>
-<header><h1>GOD'S EYE VIEW</h1><p>Crime incident observatory • public/official data only</p></header>
+<header><h1>GOD'S EYE VIEW</h1><p>Flight tracker • public/authorized data only</p></header>
 <main>
-<p class="notice">Automatically recognizes common police/open-data structures such as GeoJSON FeatureCollections, ArcGIS FeatureSets, Socrata-style JSON arrays, and common police CSV field names. It maps incident information, not private people.</p>
+<div class="notice">Displays aircraft state data supplied by a flight-data service or local JSON. It does not access aircraft systems or track private people.</div>
 <div class="toolbar">
-<label class="file">Auto-import dataset<input id="file" type="file" accept=".json,.geojson,.csv,application/json,text/csv"></label>
-<button id="demo">Load synthetic demo</button><button id="clear">Clear</button>
+<button id="demo">Load demo flights</button><button id="live">Try live feed</button>
+<label class="file">Import flight JSON<input id="file" type="file" accept=".json,application/json"></label><button id="clear">Clear</button>
 <span id="status" class="muted">Ready</span>
 </div>
-<div class="grid">
-<div class="card"><div class="label">Incidents</div><div id="count" class="value">0</div></div>
-<div class="card"><div class="label">Categories</div><div id="cats" class="value">0</div></div>
-<div class="card"><div class="label">Mapped points</div><div id="mapped" class="value">0</div></div>
-<div class="card"><div class="label">Latest date</div><div id="latest" class="value" style="font-size:18px">—</div></div>
-<div class="card"><div class="label">Detected format</div><div id="format" class="value" style="font-size:16px">—</div></div>
+<div class="stats">
+<div class="card"><div class="label">Aircraft</div><div id="count" class="value">0</div></div>
+<div class="card"><div class="label">With callsign</div><div id="callsigns" class="value">0</div></div>
+<div class="card"><div class="label">Avg altitude (ft)</div><div id="alt" class="value">—</div></div>
+<div class="card"><div class="label">Avg speed (kt)</div><div id="speed" class="value">—</div></div>
+<div class="card"><div class="label">Updated</div><div id="updated" class="value" style="font-size:17px">—</div></div>
 </div>
 <div class="layout">
-<section class="panel"><h2>Incident map</h2><div id="map"><div class="gridlines"></div><div class="legend">Approximate global view • each point = a supplied incident record</div></div></section>
+<section class="panel"><h2>Flight globe</h2><div id="space"><div id="globe"><div class="ocean-lines"></div></div><div class="badge">Approximate orthographic globe • live data depends on selected provider</div></div></section>
 <div>
-<section class="panel"><h2>Incidents</h2><div id="list" class="scroll"><div class="empty">Import a public dataset or load the synthetic demo.</div></div></section>
-<section class="panel"><h2>Selected record</h2><pre id="detail">Nothing selected.</pre></section>
+<section class="panel"><h2>Aircraft</h2><div id="list" class="scroll"><div class="empty">Load demo flights, import JSON, or try a live feed.</div></div></section>
+<section class="panel"><h2>Live feed endpoint</h2><div style="padding:13px 14px"><div class="muted">A flight service may require authentication, rate limits, or browser-access permission.</div><div class="input"><input id="endpoint" value="https://opensky-network.org/api/states/all"><button id="save">Use endpoint</button></div></div></section>
+<section class="panel"><h2>Selected aircraft</h2><pre id="detail">Nothing selected.</pre></section>
 </div>
 </div>
 </main>
 <script>
-const state={items:[],format:"—"};
+const state={flights:[]};
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
-const aliases={
- id:['id','incident_id','incidentid','case_id','caseid','objectid','report_number','record_id','unique_id'],
- date:['date','datetime','timestamp','month','occurred_on','occurrence_date','reported_date','date_occ'],
- category:['category','type','crime_type','crimetype','offense','offense_type','offense_name','primary_type','ofns_desc','ucr_crime','description'],
- location:['location','address','place','location_description','block','street','area','district','beat','premise'],
- lat:['lat','latitude','y','y_coordinate','coord_y','location_latitude'],
- lon:['lon','lng','longitude','x','x_coordinate','coord_x','location_longitude']
-};
-
-function cleanKey(k){return String(k??"").trim().toLowerCase().replace(/[\s._-]+/g,"_");}
-function rowValue(row,names){
- const map={};Object.keys(row||{}).forEach(k=>map[cleanKey(k)]=row[k]);
- for(const name of names){const v=map[cleanKey(name)];if(v!==undefined&&v!==null&&String(v).trim()!=="")return v;}
- return "";
+const endpointInput=document.getElementById("endpoint");
+const num=v=>Number.isFinite(Number(v))?Number(v):null;
+function clean(x){
+return {icao:String(x.icao24??x.icao??x.hex??x.id??""),callsign:String(x.callsign??x.flight??x.call_sign??"").trim(),country:String(x.origin_country??x.country??""),time:x.last_contact??x.timestamp??x.time??"",lon:num(x.longitude??x.lon??x.lng),lat:num(x.latitude??x.lat),altM:num(x.baro_altitude??x.altitude_m??(x.altitude_ft!=null?Number(x.altitude_ft)*.3048:null)),speedMs:num(x.velocity??x.speed_ms),heading:num(x.true_track??x.heading??x.track),raw:x};
 }
-function featureRows(obj){
- if(Array.isArray(obj)) return {rows:obj,format:"JSON array"};
- if(obj?.type==="FeatureCollection"&&Array.isArray(obj.features)){
-   return {rows:obj.features.map(f=>Object.assign({},f?.properties||{},{
-     latitude:f?.geometry?.coordinates?.[1],
-     longitude:f?.geometry?.coordinates?.[0],
-     _geometry:f?.geometry
-   })),format:"GeoJSON FeatureCollection"};
- }
- if(obj?.type==="Feature"&&obj.properties) return featureRows({type:"FeatureCollection",features:[obj]});
- if(Array.isArray(obj?.features)) return {rows:obj.features.map(f=>Object.assign({},f?.attributes||f?.properties||{},{
-   latitude:f?.geometry?.y??f?.geometry?.coordinates?.[1],
-   longitude:f?.geometry?.x??f?.geometry?.coordinates?.[0],
-   _geometry:f?.geometry
- })),format:"ArcGIS FeatureSet"};
- if(Array.isArray(obj?.data)) return {rows:obj.data,format:"Socrata-style JSON"};
- return {rows:[],format:"Unknown JSON"};
+function parseData(j){
+if(Array.isArray(j))return j.map(clean);
+if(Array.isArray(j?.states))return j.states.map(a=>clean({icao24:a[0],callsign:a[1],origin_country:a[2],last_contact:a[4],longitude:a[5],latitude:a[6],baro_altitude:a[7],velocity:a[9],true_track:a[10]}));
+if(Array.isArray(j?.aircraft))return j.aircraft.map(clean);
+if(Array.isArray(j?.data))return j.data.map(clean);
+return [];
 }
-
-function parseCSV(text){
- const rows=[];let row=[],cell="",quoted=false;
- for(let i=0;i<text.length;i++){
-   const ch=text[i],next=text[i+1];
-   if(ch==='"'&&quoted&&next==='"'){cell+='"';i++;continue}
-   if(ch==='"'){quoted=!quoted;continue}
-   if(ch===","&&!quoted){row.push(cell);cell="";continue}
-   if((ch==="\n"||ch==="\r")&&!quoted){
-     if(ch==="\r"&&next==="\n")i++;
-     row.push(cell);cell="";if(row.some(v=>v!==""))rows.push(row);row=[];continue;
-   }
-   cell+=ch;
- }
- row.push(cell);if(row.some(v=>v!==""))rows.push(row);
- if(!rows.length)return [];
- const headers=rows.shift().map(h=>h.trim());
- return rows.map(vals=>Object.fromEntries(headers.map((h,i)=>[h,(vals[i]??"").trim()])));
+function load(items,label){
+state.flights=items.filter(x=>x.lat!=null&&x.lon!=null);
+document.getElementById("status").textContent=state.flights.length+" "+label+" loaded.";
+document.getElementById("updated").textContent=new Date().toLocaleTimeString();
+render();
 }
-
-function extractGeometry(row){
- if(row?._geometry){
-   const g=row._geometry;
-   if(Array.isArray(g.coordinates)) return [Number(g.coordinates[1]),Number(g.coordinates[0])];
-   if(Number.isFinite(Number(g.y))&&Number.isFinite(Number(g.x))) return [Number(g.y),Number(g.x)];
- }
- const lat=Number(rowValue(row,aliases.lat)),lon=Number(rowValue(row,aliases.lon));
- if(Number.isFinite(lat)&&Number.isFinite(lon)) return [lat,lon];
- const loc=row.location;
- if(typeof loc==="string"){
-   const m=loc.match(/(-?\d{1,3}\.\d+)[,\s]+(-?\d{1,3}\.\d+)/);
-   if(m){const a=Number(m[1]),b=Number(m[2]);if(Math.abs(a)<=90&&Math.abs(b)<=180)return [a,b];}
- }
- return [NaN,NaN];
-}
-
-function norm(row,index){
- const geo=extractGeometry(row);
- return {
-   id:String(rowValue(row,aliases.id)||("record-"+(index+1))),
-   date:String(rowValue(row,aliases.date)||""),
-   category:String(rowValue(row,aliases.category)||"Unknown"),
-   location:String(rowValue(row,aliases.location)||""),
-   lat:geo[0],lon:geo[1],raw:row
- };
-}
-
-function importRows(rows,format){
- state.items=rows.map(norm).filter(x=>x.id||x.category);
- state.format=format;
- document.getElementById("status").textContent="Imported "+state.items.length+" record(s).";
- render();
-}
-
 function render(){
- const items=state.items;
- document.getElementById("count").textContent=items.length;
- document.getElementById("cats").textContent=new Set(items.map(x=>x.category)).size;
- document.getElementById("mapped").textContent=items.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)).length;
- const dates=items.map(x=>x.date).filter(Boolean).sort();
- document.getElementById("latest").textContent=dates[dates.length-1]||"—";
- document.getElementById("format").textContent=state.format;
- const list=document.getElementById("list");
- list.innerHTML=items.length?'<table><thead><tr><th>Date</th><th>Category</th><th>Location</th></tr></thead><tbody>'+
- items.slice(0,1000).map((x,i)=>'<tr><td><button data-i="'+i+'">'+esc(x.date||"—")+'</button></td><td>'+esc(x.category)+'</td><td>'+esc(x.location||"—")+'</td></tr>').join("")+
- '</tbody></table>':'<div class="empty">No incidents loaded.</div>';
- document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>show(items[Number(b.dataset.i)]));
- draw();
+const f=state.flights;document.getElementById("count").textContent=f.length;document.getElementById("callsigns").textContent=f.filter(x=>x.callsign).length;
+const alts=f.map(x=>x.altM).filter(x=>x!=null),sp=f.map(x=>x.speedMs).filter(x=>x!=null);
+document.getElementById("alt").textContent=alts.length?Math.round(alts.reduce((a,b)=>a+b,0)/alts.length/.3048).toLocaleString():"—";
+document.getElementById("speed").textContent=sp.length?Math.round(sp.reduce((a,b)=>a+b,0)/sp.length*1.94384):"—";
+document.getElementById("list").innerHTML=f.length?'<table><thead><tr><th>Callsign</th><th>Country</th><th>Altitude</th><th>Speed</th></tr></thead><tbody>'+f.slice(0,1000).map((x,i)=>'<tr><td><button data-i="'+i+'">'+esc(x.callsign||x.icao||"unknown")+'</button></td><td>'+esc(x.country)+'</td><td>'+esc(x.altM==null?"—":Math.round(x.altM/.3048).toLocaleString()+" ft")+'</td><td>'+esc(x.speedMs==null?"—":Math.round(x.speedMs*1.94384)+" kt")+'</td></tr>').join("")+'</tbody></table>':'<div class="empty">No aircraft loaded.</div>';
+document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>show(f[Number(b.dataset.i)]));draw();
 }
-
-function show(x){document.getElementById("detail").textContent=JSON.stringify(x?.raw||x,null,2);}
-
+function show(x){document.getElementById("detail").textContent=JSON.stringify(x?.raw||x,null,2)}
+function project(lat,lon){
+const rad=Math.PI/180,lr=0,pr=0,latr=lat*rad,lonr=lon*rad;
+const visible=Math.cos(latr)*Math.cos(lonr-lr)+Math.sin(latr)*Math.sin(pr);
+if(visible<0)return null;
+const x=Math.cos(latr)*Math.sin(lonr-lr),y=Math.cos(pr)*Math.sin(latr)-Math.sin(pr)*Math.cos(latr)*Math.cos(lonr-lr);
+return [50+x*48,50-y*48];
+}
 function draw(){
- document.querySelectorAll(".point").forEach(p=>p.remove());
- const map=document.getElementById("map");
- state.items.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.lat>=-90&&x.lat<=90&&x.lon>=-180&&x.lon<=180).slice(0,3000).forEach(x=>{
-   const p=document.createElement("button");p.className="point";
-   p.style.left=((x.lon+180)/360*100)+"%";p.style.top=((90-x.lat)/180*100)+"%";
-   p.title=x.category+" — "+(x.location||"");p.onclick=()=>show(x);map.appendChild(p);
- });
+document.querySelectorAll(".flight").forEach(p=>p.remove());const globe=document.getElementById("globe");
+state.flights.slice(0,1200).forEach(x=>{const p=project(x.lat,x.lon);if(!p)return;const b=document.createElement("button");b.className="flight"+((x.altM??0)<3000?" small":"");b.style.left=p[0]+"%";b.style.top=p[1]+"%";b.title=(x.callsign||x.icao)+" • "+(x.country||"");b.onclick=()=>show(x);globe.appendChild(b)});
 }
-
-document.getElementById("file").onchange=async e=>{
- const f=e.target.files[0];if(!f)return;
- try{
-   const text=await f.text();
-   if(/\.csv$/i.test(f.name)||(!/^\s*[\[{]/.test(text)&&text.includes(","))){
-     const rows=parseCSV(text);importRows(rows,"CSV (auto-detected)");return;
-   }
-   const obj=JSON.parse(text);const out=featureRows(obj);importRows(out.rows,out.format+" (auto-detected)");
- }catch(err){document.getElementById("status").textContent="Could not recognize this dataset: "+err.message;}
-};
-
-document.getElementById("demo").onclick=()=>importRows([
-{id:"demo-1",date:"2026-09-20",category:"Theft",location:"Synthetic demo A",lat:20.2961,lon:85.8245},
-{id:"demo-2",date:"2026-09-21",category:"Burglary",location:"Synthetic demo B",lat:28.6139,lon:77.2090},
-{id:"demo-3",date:"2026-09-22",category:"Robbery",location:"Synthetic demo C",lat:19.0760,lon:72.8777}
-],"Synthetic demo");
-
-document.getElementById("clear").onclick=()=>{
- state.items=[];state.format="—";document.getElementById("detail").textContent="Nothing selected.";
- document.getElementById("status").textContent="Cleared.";render();
-};
+document.getElementById("demo").onclick=()=>load([
+{icao:"demo01",callsign:"OWA101",country:"India",lat:20.3,lon:85.82,altitude_ft:33000,speed_ms:235},
+{icao:"demo02",callsign:"UAE204",country:"UAE",lat:25.2,lon:55.27,altitude_ft:37000,speed_ms:245},
+{icao:"demo03",callsign:"BAW16",country:"UK",lat:51.5,lon:-0.13,altitude_ft:29000,speed_ms:220},
+{icao:"demo04",callsign:"JAL12",country:"Japan",lat:35.68,lon:139.65,altitude_ft:31000,speed_ms:240},
+{icao:"demo05",callsign:"QFA8",country:"Australia",lat:-33.87,lon:151.21,altitude_ft:35000,speed_ms:250}
+].map(clean),"synthetic flights");
+document.getElementById("file").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{load(parseData(JSON.parse(await f.text())),"imported aircraft")}catch(err){document.getElementById("status").textContent="Could not read flight JSON: "+err.message}};
+document.getElementById("live").onclick=async()=>{const u=endpointInput.value.trim();document.getElementById("status").textContent="Loading live flight data…";try{const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);load(parseData(await r.json()),"live aircraft")}catch(err){document.getElementById("status").textContent="Live feed failed: "+err.message}};
+document.getElementById("save").onclick=()=>document.getElementById("status").textContent="Endpoint ready: "+endpointInput.value;
+document.getElementById("clear").onclick=()=>{state.flights=[];document.getElementById("detail").textContent="Nothing selected.";document.getElementById("status").textContent="Cleared.";render()};
 render();
 </script>
 </body>
