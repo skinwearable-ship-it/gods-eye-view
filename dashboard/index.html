@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>God's Eye View</title>
+<style>
+:root{color-scheme:dark;--bg:#081018;--panel:#0f1b27;--line:#223447;--text:#e8f0f7;--muted:#94a8bb;--good:#55d48a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#112438 0,#081018 45%);font:14px/1.45 system-ui,sans-serif;color:var(--text)}
+header{padding:28px 5vw 18px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:30px;letter-spacing:.04em}header p{margin:6px 0 0;color:var(--muted)}
+main{max-width:1400px;margin:auto;padding:22px 5vw 50px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+button,.file{background:#142536;color:var(--text);border:1px solid #2c4258;border-radius:10px;padding:9px 12px;cursor:pointer}.file input{display:none}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.card{background:rgba(15,27,39,.9);border:1px solid var(--line);border-radius:14px;padding:16px}.value{font-size:28px;font-weight:700}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.panel{background:rgba(15,27,39,.92);border:1px solid var(--line);border-radius:14px;overflow:auto;margin-bottom:18px}.panel h2{font-size:16px;margin:0;padding:15px 16px;border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:11px 13px;border-bottom:1px solid #1c2c3c;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}.muted{color:var(--muted)}.good{color:var(--good)}
+pre{white-space:pre-wrap;margin:0;padding:16px;color:#c9d8e6}.empty{padding:35px;text-align:center;color:var(--muted)}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>GOD'S EYE VIEW</h1>
+<p>Offline security situational awareness • authorized systems only</p>
+</header>
+<main>
+<div class="toolbar">
+<label class="file">Import JSON reports<input id="files" type="file" accept=".json,application/json" multiple></label>
+<button id="demo">Load demo</button>
+<button id="clear">Clear</button>
+<span id="status" class="muted"></span>
+</div>
+<section class="grid">
+<div class="card"><div class="label">Endpoints</div><div id="count" class="value">0</div></div>
+<div class="card"><div class="label">Operating systems</div><div id="oses" class="value">0</div></div>
+<div class="card"><div class="label">Unique gateways</div><div id="nets" class="value">0</div></div>
+<div class="card"><div class="label">Reports loaded</div><div id="reports" class="value">0</div></div>
+</section>
+<section class="panel">
+<h2>Endpoint overview</h2>
+<div id="tableWrap" class="empty">Import collector reports to populate the dashboard.</div>
+</section>
+<section class="panel">
+<h2>Selected report</h2>
+<pre id="detail">No report selected.</pre>
+</section>
+</main>
+<script>
+const state={items:[]};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function render(){
+ const items=state.items;
+ document.querySelector("#count").textContent=new Set(items.map(x=>x.hostname||x.id)).size;
+ document.querySelector("#oses").textContent=new Set(items.map(x=>x.os||"Unknown")).size;
+ document.querySelector("#nets").textContent=new Set(items.map(x=>x.network?.gateway||"Unknown")).size;
+ document.querySelector("#reports").textContent=items.length;
+ const wrap=document.querySelector("#tableWrap");
+ if(!items.length){wrap.className="empty";wrap.textContent="Import collector reports to populate the dashboard.";return}
+ wrap.className="";
+ wrap.innerHTML="<table><thead><tr><th>Host</th><th>OS</th><th>Local IP</th><th>Gateway</th><th>Collected</th><th>Status</th></tr></thead><tbody>"+
+ items.map((x,i)=>"<tr><td><button data-i='"+i+"'>"+esc(x.hostname||x.id||"unknown")+"</button></td><td>"+esc(x.os)+"</td><td>"+esc(x.network?.local_ip)+"</td><td>"+esc(x.network?.gateway)+"</td><td>"+esc(x.collected_at)+"</td><td class='good'>Local report</td></tr>").join("")+
+ "</tbody></table>";
+ wrap.querySelectorAll("button").forEach(b=>b.onclick=()=>show(+b.dataset.i));
+}
+function show(i){document.querySelector("#detail").textContent=JSON.stringify(state.items[i],null,2)}
+document.querySelector("#files").addEventListener("change",async e=>{
+ const added=[];
+ for(const f of e.target.files){try{const x=JSON.parse(await f.text());if(x&&x.schema==="gods-eye-view/v1")added.push(x)}catch(err){}}
+ state.items.push(...added);document.querySelector("#status").textContent=added.length+" report(s) imported";render();
+});
+document.querySelector("#clear").onclick=()=>{state.items=[];document.querySelector("#status").textContent="Cleared";render();document.querySelector("#detail").textContent="No report selected."};
+document.querySelector("#demo").onclick=()=>{state.items=[{schema:"gods-eye-view/v1",id:"demo-1",hostname:"lab-host",os:"Demo OS",collected_at:new Date().toISOString(),network:{local_ip:"192.168.1.20",gateway:"192.168.1.1",dns:["192.168.1.1"]},notes:"Demo data only"}];render();show(0);document.querySelector("#status").textContent="Demo report loaded"};
+render();
+</script>
+</body>
+</html>
